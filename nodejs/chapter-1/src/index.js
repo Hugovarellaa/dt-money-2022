@@ -47,9 +47,23 @@ app.post("/account", (req, res) => {
 
 app.get("/statement", VerifyIfExistsAccountCPF, (req, res) => {
   const { customer } = req;
-
   // Retornando Statement
   res.send(customer.statement);
+});
+
+app.post("/deposit", VerifyIfExistsAccountCPF, (req, res) => {
+  const { customer } = req;
+  const { description, amount } = req.body;
+
+  const statementOperation = {
+    description,
+    amount,
+    created_at: new Date(),
+    type: "deposit",
+  };
+  customer.statement.push(statementOperation);
+
+  res.status(201).json(statementOperation);
 });
 
 app.listen(3333, () => console.log("server start on port 3333"));
