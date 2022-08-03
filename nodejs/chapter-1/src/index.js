@@ -54,13 +54,13 @@ app.post("/account", (req, res) => {
   };
 
   customers.push(user);
-  res.status(201).send();
+  return res.status(201).send();
 });
 
 app.get("/statement", VerifyIfExistsAccountCPF, (req, res) => {
   const { customer } = req;
   // Retornando Statement
-  res.send(customer.statement);
+  return res.send(customer.statement);
 });
 
 app.post("/deposit", VerifyIfExistsAccountCPF, (req, res) => {
@@ -75,7 +75,7 @@ app.post("/deposit", VerifyIfExistsAccountCPF, (req, res) => {
   };
   customer.statement.push(statementOperation);
 
-  res.status(201).json(statementOperation);
+  return res.status(201).json(statementOperation);
 });
 
 app.post("/withdraw", VerifyIfExistsAccountCPF, (req, res) => {
@@ -95,7 +95,7 @@ app.post("/withdraw", VerifyIfExistsAccountCPF, (req, res) => {
 
   customer.statement.push(statementOperation);
 
-  res.status(201).send();
+  return res.status(201).send();
 });
 
 app.get("/statement/date", VerifyIfExistsAccountCPF, (req, res) => {
@@ -122,7 +122,12 @@ app.put("/account", VerifyIfExistsAccountCPF, (req, res) => {
   const { name } = req.body;
 
   customer.name = name;
-  res.status(200).send();
+  return res.status(200).send();
+});
+
+app.get("/account", VerifyIfExistsAccountCPF, (req, res) => {
+  const { customer } = req;
+  return res.json(customer);
 });
 
 app.listen(3333, () => console.log("server start on port 3333"));
