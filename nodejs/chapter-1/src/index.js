@@ -130,4 +130,11 @@ app.get("/account", VerifyIfExistsAccountCPF, (req, res) => {
   return res.json(customer);
 });
 
+app.delete("/account", VerifyIfExistsAccountCPF, (req, res) => {
+  const { customer } = req;
+  const index = customers.indexOf(customer);
+  customers.splice(index, 1);
+  return res.status(204).send();
+});
+
 app.listen(3333, () => console.log("server start on port 3333"));
