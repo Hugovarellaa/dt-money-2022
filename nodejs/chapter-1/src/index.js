@@ -20,6 +20,18 @@ function VerifyIfExistsAccountCPF(req, res, next) {
   return next();
 }
 
+// Função para saber se o saque pode ser realizado
+function getBalance(amount) {
+  const balance = amount.reduce((acc, operation) => {
+    if (operation.type === "deposit") {
+      return acc + operation.amount;
+    } else {
+      return acc - operation.amount;
+    }
+  }, 0);
+  return balance;
+}
+
 const customers = [];
 
 app.post("/account", (req, res) => {
@@ -64,6 +76,45 @@ app.post("/deposit", VerifyIfExistsAccountCPF, (req, res) => {
   customer.statement.push(statementOperation);
 
   res.status(201).json(statementOperation);
+});
+
+app.post("/withdraw", VerifyIfExistsAccountCPF, (req, res) => {
+  const { amount } = req.body;
+  const { customer } = req;
+
+  const balance = getBalance(customer.statement);
+  if (balance < amount) {
+    return res.status(400).send({ message: "Insufficient funds" });
+  }
+
+  const statementOperation = {
+    amount,
+    created_at: new Date(),
+    type: "withdraw",
+  };
+
+  customer.statement.push(statementOperation);
+
+  res.status(201).send();
+});
+
+app.get("/statement/date", VerifyIfExistsAccountCPF, (req, res) => {
+  const { customer } = req;
+  const { date } = req.query;
+
+  // Código menor do que o de baixo
+  const statement = customer.statement.filter(
+    (operation) => operation.created_at.toISOString().includes(date)
+  );
+
+  // const dateFormatted = new Date(date + " 00:00");
+  // const statementOperation = customer.statement.filter(
+  //   (statement) =>
+  //     statement.created_at.toDateString() ===
+  //     new Date(dateFormatted).toDateString()
+  // );
+
+  return res.json(statement);
 });
 
 app.listen(3333, () => console.log("server start on port 3333"));
