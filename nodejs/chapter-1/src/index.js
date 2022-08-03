@@ -103,8 +103,8 @@ app.get("/statement/date", VerifyIfExistsAccountCPF, (req, res) => {
   const { date } = req.query;
 
   // Código menor do que o de baixo
-  const statement = customer.statement.filter(
-    (operation) => operation.created_at.toISOString().includes(date)
+  const statement = customer.statement.filter((operation) =>
+    operation.created_at.toISOString().includes(date)
   );
 
   // const dateFormatted = new Date(date + " 00:00");
@@ -115,6 +115,14 @@ app.get("/statement/date", VerifyIfExistsAccountCPF, (req, res) => {
   // );
 
   return res.json(statement);
+});
+
+app.put("/account", VerifyIfExistsAccountCPF, (req, res) => {
+  const { customer } = req;
+  const { name } = req.body;
+
+  customer.name = name;
+  res.status(200).send();
 });
 
 app.listen(3333, () => console.log("server start on port 3333"));
