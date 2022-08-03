@@ -4,6 +4,22 @@ const { v4: uuidV4 } = require("uuid");
 const app = express();
 app.use(express.json());
 
+// Middleware
+function VerifyIfExistsAccountCPF(req, res, next) {
+  const { cpf } = req.headers;
+
+  // Validando CPF existente
+  const customer = customers.find((customer) => customer.cpf === cpf);
+
+  // Se nao existir dá error
+  if (!customer) {
+    res.status(404).send({ message: "Customer not found" });
+  }
+
+  req.customer = customer;
+  return next();
+}
+
 const customers = [];
 
 app.post("/account", (req, res) => {
@@ -29,16 +45,8 @@ app.post("/account", (req, res) => {
   res.status(201).send();
 });
 
-app.get("/statement", (req, res) => {
-  const { cpf } = req.headers;
-
-  // Validando CPF existente
-  const customer = customers.find((customer) => customer.cpf === cpf);
-
-  // Se nao existir dá error
-  if (!customer) {
-    res.status(404).send({ message: "Customer not found" });
-  }
+app.get("/statement", VerifyIfExistsAccountCPF, (req, res) => {
+  const { customer } = req;
 
   // Retornando Statement
   res.send(customer.statement);
