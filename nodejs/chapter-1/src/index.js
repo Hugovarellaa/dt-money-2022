@@ -30,7 +30,7 @@ app.post("/account", (req, res) => {
 });
 
 app.get("/statement", (req, res) => {
-  const { cpf } = req.query;
+  const { cpf } = req.headers;
 
   // Validando CPF existente
   const customer = customers.find((customer) => customer.cpf === cpf);
@@ -41,7 +41,7 @@ app.get("/statement", (req, res) => {
   }
 
   // Retornando Statement
-  res.status(200).send(customer.statement);
+  res.send(customer.statement);
 });
 
 app.listen(3333, () => console.log("server start on port 3333"));
